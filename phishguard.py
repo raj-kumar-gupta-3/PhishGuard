@@ -1,4 +1,5 @@
 import re
+import sys
 from urllib.parse import urlparse
 
 
@@ -71,25 +72,17 @@ def analyze_url(url):
     }
 
 
-def main():
-    print("=" * 45)
+def display_result(result):
+    print("\n" + "=" * 45)
     print("           PHISHGUARD URL ANALYZER")
     print("=" * 45)
-
-    url = input("Enter URL: ").strip()
-
-    if not url:
-        print("\nError: Please enter a URL.")
-        return
-
-    result = analyze_url(url)
+    print("Analyzing URL:", result["url"])
+    print()
 
     if result["result"] == "INVALID":
-        print("\nError: Invalid URL.")
+        print("Error: Invalid URL.")
+        print("=" * 45)
         return
-
-    print("\nAnalyzing URL:", result["url"])
-    print()
 
     if result["warnings"]:
         print("Warnings:")
@@ -103,6 +96,20 @@ def main():
     print("-" * 45)
     print("Result:", result["result"])
     print("=" * 45)
+
+
+def main():
+    if len(sys.argv) > 1:
+        url = sys.argv[1].strip()
+    else:
+        url = input("Enter URL: ").strip()
+
+    if not url:
+        print("Error: Please enter a URL.")
+        return
+
+    result = analyze_url(url)
+    display_result(result)
 
 
 if __name__ == "__main__":
