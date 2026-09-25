@@ -13,8 +13,12 @@ def analyze_url(url):
     domain = parsed.netloc
 
     if not domain or "." not in domain:
-        print("\nError: Invalid URL.")
-        return
+        return {
+            "url": url,
+            "score": 0,
+            "warnings": ["Invalid URL"],
+            "result": "INVALID"
+        }
 
     if parsed.scheme != "https":
         score += 1
@@ -52,40 +56,54 @@ def analyze_url(url):
         score += 1
         warnings.append("Many subdomains/dots detected")
 
-    print("\n" + "=" * 45)
-    print("                 PHISHGUARD")
+    if score >= 4:
+        result = "HIGH RISK"
+    elif score >= 2:
+        result = "SUSPICIOUS"
+    else:
+        result = "LOW RISK"
+
+    return {
+        "url": url,
+        "score": score,
+        "warnings": warnings,
+        "result": result
+    }
+
+
+def main():
     print("=" * 45)
-    print("Analyzing URL:", url)
+    print("           PHISHGUARD URL ANALYZER")
+    print("=" * 45)
+
+    url = input("Enter URL: ").strip()
+
+    if not url:
+        print("\nError: Please enter a URL.")
+        return
+
+    result = analyze_url(url)
+
+    if result["result"] == "INVALID":
+        print("\nError: Invalid URL.")
+        return
+
+    print("\nAnalyzing URL:", result["url"])
     print()
 
-    if warnings:
+    if result["warnings"]:
         print("Warnings:")
-        for warning in warnings:
+        for warning in result["warnings"]:
             print("  -", warning)
     else:
         print("No basic warning signs detected.")
 
     print("\n" + "-" * 45)
-    print("Risk Score:", score)
+    print("Risk Score:", result["score"])
     print("-" * 45)
-
-    if score >= 4:
-        print("Result: HIGH RISK")
-    elif score >= 2:
-        print("Result: SUSPICIOUS")
-    else:
-        print("Result: LOW RISK")
-
+    print("Result:", result["result"])
     print("=" * 45)
 
 
-print("=" * 45)
-print("           PHISHGUARD URL ANALYZER")
-print("=" * 45)
-
-url = input("Enter URL: ").strip()
-
-if not url:
-    print("\nError: Please enter a URL.")
-else:
-    analyze_url(url)
+if __name__ == "__main__":
+    main()
